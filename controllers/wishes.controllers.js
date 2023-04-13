@@ -15,7 +15,7 @@ const addWish = async (req, res) => {
 
     return res.status(200).json({
       ok: true,
-      todo: wishToAdd,
+      wish: wishToAdd,
     });
   } catch (error) {
     return res.status(503).json({

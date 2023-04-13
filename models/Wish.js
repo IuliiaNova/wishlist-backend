@@ -1,7 +1,7 @@
 const { Schema, model } = require("mongoose");
 
 const WishSchema = Schema({
-  wish: {
+  wishTitle: {
     type: String,
     required: true,
   },
@@ -9,6 +9,9 @@ const WishSchema = Schema({
     type: String,
     required: true,
   },
+  state: {
+    type: String
+  }
 });
 
 module.exports = model("Wish", WishSchema); 

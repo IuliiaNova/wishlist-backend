@@ -2,13 +2,14 @@ const { v4: uuidv4 } = require('uuid');
 const Wish = require("../models/Wish");
 
 const addWish = async (req, res) => {
-  const { wish } = req.body;
+  const { wishTitle, state } = req.body;
   const wishId = uuidv4();
 
   try {
     const wishToAdd = new Wish({
-      wish,
+      wishTitle,
       wishId,
+      state
     });
 
     await wishToAdd.save();
@@ -51,12 +52,14 @@ const deleteWish = async (req, res) => {
 };
 
 const updateWish = async (req, res) => {
-  const { wishId, wish } = req.body;
+  const { wishId, wishTitle, state } = req.body;
+  
 
   try {
     await Wish.findOneAndUpdate({
       wishId: wishId,
-      wish: wish,
+      wishTitle: wishTitle,
+      state: state
     });
     return res.status(200).json({
       ok: true,

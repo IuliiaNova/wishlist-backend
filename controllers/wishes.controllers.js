@@ -1,18 +1,17 @@
-const { v4: uuidv4 } = require('uuid');
 const Wish = require("../models/Wish");
 
 const addWish = async (req, res) => {
   const { wishTitle, state } = req.body;
-  const wishId = uuidv4();
+  console.log(req.auth)
 
   try {
-    const wishToAdd = new Wish({
-      wishTitle,
-      wishId,
-      state
-    });
+    const wishToAdd = new Wish();
 
-    await wishToAdd.save();
+    wishToAdd.wishTitle = wishTitle;
+    wishToAdd.state = "Active"
+
+    const response =  await wishToAdd.save();
+    console.log(response)
 
     return res.status(200).json({
       ok: true,
@@ -22,6 +21,7 @@ const addWish = async (req, res) => {
     return res.status(503).json({
       ok: false,
       msg: "Ooops, something happened...",
+      error
     });
   }
 };

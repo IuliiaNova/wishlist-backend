@@ -5,12 +5,9 @@ const WishSchema = Schema({
     type: String,
     required: true,
   },
-  wishId: {
-    type: String,
-    required: true,
-  },
   state: {
-    type: String
+    type: String,
+    default: String
   }
 });
 

@@ -40,7 +40,7 @@ const deleteWish = async (req, res) => {
   const { id } = req.params;
 
   try {
-    const found = await Wish.deleteOne({ wishId: id });
+    const found = await Wish.deleteOne({ _id: id });
 
     return res.status(200).json({
       ok: true,

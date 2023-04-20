@@ -26,7 +26,7 @@ const checkUser = async (req, res) => {
     const user = await UserModel.findOne({ email })
     console.log(user)
     if(user){
-     return res.status(200).send({ msg: 'Exists', id: user.id })
+     return res.status(200).send({ msg: 'Exists', id: user._id })
     }
 
     const newUser = await UserModel.create({name, password, email})

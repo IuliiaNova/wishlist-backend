@@ -54,7 +54,6 @@ const deleteWish = async (req, res) => {
 const updateWish = async (req, res) => {
   const { wishId, wishTitle, state } = req.body;
   
-
   try {
     await Wish.findOneAndUpdate({
       wishId: wishId,
@@ -70,4 +69,22 @@ const updateWish = async (req, res) => {
   }
 };
 
-module.exports = { addWish, getWishes, deleteWish, updateWish };
+const updateWishState = async (req, res) => {
+  const { wishId, wishTitle, state } = req.body;
+
+  try {
+    await Wish.findOneAndUpdate({
+      wishId: wishId,
+      wishTitle: wishTitle,
+      state: state
+    });
+    return res.status(200).json({
+      ok: true,
+      msg: "The wishstate was updated",
+    });
+  } catch (error) {
+    res.status(503).json({ ok: false, msg: "Ooops, something happened..." });
+  }
+};
+
+module.exports = { addWish, getWishes, deleteWish, updateWish, updateWishState };

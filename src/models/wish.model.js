@@ -11,4 +11,7 @@ const WishSchema = Schema({
   }
 });
 
-module.exports = model("Wish", WishSchema); 
+const WishModel = model("Wish", WishSchema)
+
+module.exports = WishModel 
+ 

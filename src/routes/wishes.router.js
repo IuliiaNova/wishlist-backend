@@ -4,7 +4,8 @@ const authMiddleware = require("../middleware/auth.middleware")
 
 
 wishesRouter.post("/addwish", authMiddleware.jwtCheck, addWish);
-wishesRouter.get("/getwishes", getWishes);
+//wishesRouter.get("/getwishes", getWishes);
+wishesRouter.get("/:id", getWishes);
 wishesRouter.delete("/deletewish/:id", deleteWish);
 wishesRouter.put("/updatewish", updateWish);
 wishesRouter.put("/updatewish", updateWishState);

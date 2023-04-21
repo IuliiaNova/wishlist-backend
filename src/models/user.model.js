@@ -3,15 +3,15 @@ const { Schema, model } = require('mongoose')
 const UserSchema = new Schema({
   name: {
     type: String,
-    required: [true, 'Please provide a name']
+    required: [true, 'Please put your name']
   },
   email: {
     type: String,
-    required: [true, 'Please provide an email']
+    required: [true, 'Please put your email']
   },
   picture: {
     type: String,
-    required: [true, 'Please provide a picture']
+    required: [true, 'Please update your profile photo']
   },
   todo: [
     {

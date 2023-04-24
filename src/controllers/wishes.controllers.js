@@ -1,7 +1,7 @@
 const Wish = require("../models/wish.model");
 const UserModel = require('../models/user.model')
 
-const addWish = async (req, res) => {
+/*const addWish = async (req, res) => {
   const { wishTitle, state } = req.body;
   const { id } = req.params
 
@@ -23,9 +23,9 @@ const addWish = async (req, res) => {
   } catch (error) {
     return res.status(503).send({ message: error.message});
   }
-};
+};*/
 
-/*
+
 const addWish = async (req, res) => {
   const { wishTitle, state } = req.body;
   const { id } = req.params
@@ -65,9 +65,9 @@ const getWishes = async (req, res) => {
   } catch (error) {
     return res.status(503).json({ ok: false, msg: "Ooops, something happened..." });
   }
-};*/
+};
 
-const getWishes = async (req, res) => {
+/*const getWishes = async (req, res) => {
   const {id } = req.params
   try {
     const wishes = await UserModel.findById(id).populate('wish')
@@ -76,7 +76,7 @@ const getWishes = async (req, res) => {
   } catch (error) {
     res.status(500).send({ message: error.message })
   }
-};
+};*/
 
 const deleteWish = async (req, res) => {
   const { id } = req.params;

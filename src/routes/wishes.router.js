@@ -1,20 +1,20 @@
-const wishesRouter = require('express').Router()
+const express = require("express")
+const wishesRouter = express.Router()
 
 const { 
   addWish, 
-  getWishes, 
-  deleteWish, 
   updateWish, 
-  updateWishState 
+  updateWishState,
+  deleteWish
 } = require("../controllers/wishes.controllers");
 
-const authMiddleware = require("../middleware/auth.middleware")
 
+const checkJWT = require("../middleware/checkJWT")
 
-wishesRouter.post("/addwish", authMiddleware.jwtCheck, addWish);
-wishesRouter.get("/getwishes", authMiddleware.jwtCheck, getWishes);
-wishesRouter.delete("/deletewish/:id", authMiddleware.jwtCheck, deleteWish);
-wishesRouter.put("/updatewish", authMiddleware.jwtCheck, updateWish);
-wishesRouter.put("/updatewish", authMiddleware.jwtCheck, updateWishState);
+wishesRouter.post("/", checkJWT, addWish);
+wishesRouter.put("/updatewish", checkJWT, updateWish);
+wishesRouter.put("/updatewishstate", checkJWT, updateWishState);
+wishesRouter.delete("/deletewish", checkJWT, deleteWish);
+
 
 module.exports = wishesRouter

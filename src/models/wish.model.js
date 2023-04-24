@@ -1,6 +1,6 @@
 const { Schema, model } = require("mongoose");
 
-const WishSchema = Schema({
+const WishSchema = new Schema({
   wishTitle: {
     type: String,
     required: [true, 'The title is requered'],
@@ -8,10 +8,10 @@ const WishSchema = Schema({
   state: {
     type: String,
     default: String
+  }, 
+  key: {
+    type: String
   }
 });
 
-const WishModel = model("Wish", WishSchema)
-
-module.exports = WishModel 
- 
+module.exports = model("Wish", WishSchema)

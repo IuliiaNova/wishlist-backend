@@ -9,18 +9,21 @@ const UserSchema = new Schema({
     type: String,
     required: [true, 'Please put your email']
   },
-  picture: {
+  password: {
     type: String,
-    required: [true, 'Please update your profile photo']
   },
-  todo: [
+  userID: {
+    type: String,
+    required: true
+  },
+  wishes: [
     {
-      type: Schema.Types.ObjectId,
-      ref: 'Todo'
-    }
+      type: [Schema.Types.ObjectId],
+      ref: 'Wish',
+      require: true,
+      default: []
+    },
   ]
-})
+});
 
-const UserModel = model('User', UserSchema)
-
-module.exports = UserModel
+module.exports = model('User', UserSchema)

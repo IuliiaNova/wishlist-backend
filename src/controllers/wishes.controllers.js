@@ -1,51 +1,45 @@
+const mongoose = require("mongoose");
 const Wish = require("../models/wish.model");
-const UserModel = require('../models/user.model')
-
-/*const addWish = async (req, res) => {
-  const { wishTitle, state } = req.body;
-  const { id } = req.params
-
-  if(!wishTitle) return res.status(400).send({ msg: 'Please put your task' })
-  if(!id) return res.status(400).send({ msg: 'UsrID needed' })
-
-  try {
-    const user = await UserModel.findById(id);
-
-    const wishToAdd = await Wish.create({
-      wishTitle: wishTitle,
-      state: "Active"
-    })
-
-    user.wishes.push(wishToAdd._id);
-    user.save();
-    res.status(201).send({ data: wishToAdd})
-
-  } catch (error) {
-    return res.status(503).send({ message: error.message});
-  }
-};*/
+const User = require('../models/user.model');
 
 
 const addWish = async (req, res) => {
-  const { wishTitle, state } = req.body;
-  const { id } = req.params
+  const { wish, userID } = req.body;
 
-  if(!wishTitle) return res.status(400).send({ msg: 'Please put your task' })
-  if(!id) return res.status(400).send({ msg: 'UsrID needed' })
+  if (!wish || !userID) {
+    return res.status(503).json({
+      ok: false,
+      msg: 'Please put your task'
+    })
+  }
 
   try {
-    const user = await UserModel.findById(id)
-    const wishToAdd = new Wish();
+    const newWish = new Wish({
+      wishTitle: wish,
+      state: "Active",
+      key: userID,
+    });
 
-    wishToAdd.wishTitle = wishTitle;
-    wishToAdd.state = "Active"
+    const user = await User.findByIdAndUpdate(
+      { _id: userID },
+      { $push: { wishes: newWish } },
+      { new: true }
+    );
 
-    const response =  await wishToAdd.save();
-    console.log(response)
+    if (!user) {
+      return res.status(503).json({
+        ok: false,
+        msg: 'Ooops something happend',
+      });
+    }
 
-    return res.status(200).json({
+    await newWish.save();
+
+    const userResp = await user.populate("wishes");
+
+    return res.status(201).json({
       ok: true,
-      wish: wishToAdd,
+      user: userResp,
     });
   } catch (error) {
     return res.status(503).json({
@@ -53,80 +47,104 @@ const addWish = async (req, res) => {
       msg: "Ooops, something happened...",
       error
     });
-  }
-};
+  };
+}
 
 
-const getWishes = async (req, res) => {
-  try {
-    const wishes = await Wish.find();
-
-    return res.status(200).json({ ok: true, wishes });
-  } catch (error) {
-    return res.status(503).json({ ok: false, msg: "Ooops, something happened..." });
-  }
-};
-
-/*const getWishes = async (req, res) => {
-  const {id } = req.params
-  try {
-    const wishes = await UserModel.findById(id).populate('wish')
-
-    res.status(200).send({ data: wishes});
-  } catch (error) {
-    res.status(500).send({ message: error.message })
-  }
-};*/
 
 const deleteWish = async (req, res) => {
-  const { id } = req.params;
+  const { wish, userID } = req.body;
+
+  const session = await mongoose.startSession();
+  session.startTransaction()
 
   try {
-    const found = await Wish.deleteOne({ _id: id });
+    await Wish.findByIdAndDelete(wish._id ).session(session); 
+    const user = await User.findById(userID).session(session); 
+
+    if(!user){
+      await session.abortTransaction();
+      session.endSession();
+      return res.status(503).json({
+        ok: false,
+        msg: "User not found",
+      });
+    }
+
+    user.wishes.pull(wish._id);
+    await user.save();
+
+    await session.commitTransaction();
+    session.endSession();
+    const updateUser = await user.populate("wishes");
 
     return res.status(200).json({
       ok: true,
-      msg: "The wish was deleted",
+      user: updateUser,
     });
   } catch (error) {
-    res.status(503).json({ ok: false, msg: "Ooops, something happened..." });
+    console.log(error);
+    await session.abortTransaction();
+    session.endSession();
+    return res.status(503).json({ 
+      ok: false, 
+      msg: "Ooops, something happened..." });
   }
 };
+
+
 
 const updateWish = async (req, res) => {
-  const { wishId, wishTitle, state } = req.body;
-  
+  const { wishId, wishTitle, userID } = req.body;
+
   try {
-    await Wish.findOneAndUpdate({
-      wishId: wishId,
+    await Wish.findByIdAndUpdate({
+      wishId,
       wishTitle: wishTitle,
-      state: state
+      new: true,
     });
+    const user = await User.findById(userID).populate("wishes");
     return res.status(200).json({
       ok: true,
-      msg: "The wish was updated",
+      user
     });
   } catch (error) {
-    res.status(503).json({ ok: false, msg: "Ooops, something happened..." });
+    console.log(error);
+    return res.status(503).json({ 
+      ok: false, 
+      msg: "Ooops, something happened..." });
   }
 };
+
+
 
 const updateWishState = async (req, res) => {
-  const { wishId, wishTitle, state } = req.body;
+  const { wish, state, userID } = req.body;
 
   try {
-    await Wish.findOneAndUpdate({
-      wishId: wishId,
-      wishTitle: wishTitle,
-      state: state
-    });
+    await Wish.findOneAndUpdate(
+      { _id: wish._id},
+      { state: state},
+      { new: true}
+    );
+
+    const user = await User.findOne({ _id: userID }).populate("wishes");
     return res.status(200).json({
       ok: true,
-      msg: "The wishstate was updated",
+      user
     });
   } catch (error) {
-    res.status(503).json({ ok: false, msg: "Ooops, something happened..." });
+    return res.status(503).json({ 
+      ok: false, 
+      msg: "Ooops, something happened...",
+     });
+    }
   }
-};
 
-module.exports = { addWish, getWishes, deleteWish, updateWish, updateWishState };
+
+module.exports = {
+  addWish,
+  deleteWish,
+  updateWish,
+  updateWishState
+};
